@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KechngDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.kechng_name as kechngName
+        ,a.kechng_photo as kechngPhoto
+        ,a.kechng_types as kechngTypes
+        ,a.shangke_time as shangkeTime
+        ,a.xiake_time as xiakeTime
+        ,a.kechng_content as kechngContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KechngView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM kechng  a
+
+        <where>
+            <if test="params.kechngNameStart != null">
+                <![CDATA[  and a.kechng_name >= #{params.kechngNameStart}   ]]>
+            </if>
+            <if test="params.kechngNameEnd != null">
+                <![CDATA[  and a.kechng_name <= #{params.kechngNameEnd}   ]]>
+            </if>
+            <if test="params.kechngTypes != null">
+                and a.kechng_types = #{params.kechngTypes}
+            </if>
+            <if test=" params.shangkeTimeStart != '' and params.shangkeTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.shangke_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.shangkeTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.shangkeTimeEnd != '' and params.shangkeTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.shangke_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.shangkeTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.xiakeTimeStart != '' and params.xiakeTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.xiake_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.xiakeTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.xiakeTimeEnd != '' and params.xiakeTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.xiake_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.xiakeTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.kechngContent != '' and params.kechngContent != null and params.kechngContent != 'null' ">
+                and a.kechng_content like CONCAT('%',#{params.kechngContent},'%')
+            </if>
+
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

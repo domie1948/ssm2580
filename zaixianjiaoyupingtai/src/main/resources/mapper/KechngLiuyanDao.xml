@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.KechngLiuyanDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.kechng_id as kechngId
+        ,a.yonghu_id as yonghuId
+        ,a.kechng_liuyan_content as kechngLiuyanContent
+        ,a.reply_content as replyContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.KechngLiuyanView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,kechng.kechng_name as kechngName
+        ,kechng.kechng_photo as kechngPhoto
+        ,kechng.kechng_types as kechngTypes
+        ,kechng.shangke_time as shangkeTime
+        ,kechng.xiake_time as xiakeTime
+        ,kechng.kechng_content as kechngContent
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.sex_types as sexTypes
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_photo as yonghuPhoto
+
+        FROM kechng_liuyan  a
+        left JOIN kechng kechng ON a.kechng_id = kechng.id
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.kechngId != null">
+                and a.kechng_id = #{params.kechngId}
+            </if>
+            <if test="params.yonghuId != null">
+                and a.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.kechngLiuyanContent != '' and params.kechngLiuyanContent != null and params.kechngLiuyanContent != 'null' ">
+                and a.kechng_liuyan_content like CONCAT('%',#{params.kechngLiuyanContent},'%')
+            </if>
+            <if test=" params.replyContent != '' and params.replyContent != null and params.replyContent != 'null' ">
+                and a.reply_content like CONCAT('%',#{params.replyContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+            <if test="params.kechngNameStart != null ">
+                <![CDATA[  and kechng.kechng_name >= #{params.kechngNameStart}   ]]>
+            </if>
+            <if test="params.kechngNameEnd != null ">
+                <![CDATA[  and kechng.kechng_name <= #{params.kechngNameEnd}   ]]>
+            </if>
+            <if test="params.kechngTypes != null">
+                and kechng.kechng_types = #{params.kechngTypes}
+            </if>
+
+            <if test=" params.shangkeTimeStart != '' and params.shangkeTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(kechng.shangke_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.shangkeTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.shangkeTimeEnd != '' and params.shangkeTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(kechng.shangke_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.shangkeTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.xiakeTimeStart != '' and params.xiakeTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(kechng.xiake_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.xiakeTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.xiakeTimeEnd != '' and params.xiakeTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(kechng.xiake_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.xiakeTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+            <if test=" params.kechngContent != '' and params.kechngContent != null and params.kechngContent != 'null' ">
+                and kechng.kechng_content like CONCAT('%',#{params.kechngContent},'%')
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and yonghu.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>

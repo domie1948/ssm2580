@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZaixianxuexiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zaixianxuexi_name as zaixianxuexiName
+        ,a.zaixianxuexi_photo as zaixianxuexiPhoto
+        ,a.kechng_types as kechngTypes
+        ,a.zaixianxuexi_video as zaixianxuexiVideo
+        ,a.jiaoshi_id as jiaoshiId
+        ,a.zaixianxuexi_content as zaixianxuexiContent
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZaixianxuexiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,jiaoshi.jiaoshi_name as jiaoshiName
+        ,jiaoshi.sex_types as sexTypes
+        ,jiaoshi.jiaoshi_id_number as jiaoshiIdNumber
+        ,jiaoshi.jiaoshi_phone as jiaoshiPhone
+        ,jiaoshi.jiaoshi_photo as jiaoshiPhoto
+
+        FROM zaixianxuexi  a
+        left JOIN jiaoshi jiaoshi ON a.jiaoshi_id = jiaoshi.id
+
+        <where>
+            <if test=" params.zaixianxuexiName != '' and params.zaixianxuexiName != null and params.zaixianxuexiName != 'null' ">
+                and a.zaixianxuexi_name like CONCAT('%',#{params.zaixianxuexiName},'%')
+            </if>
+            <if test="params.kechngTypes != null">
+                and a.kechng_types = #{params.kechngTypes}
+            </if>
+            <if test=" params.zaixianxuexiVideo != '' and params.zaixianxuexiVideo != null and params.zaixianxuexiVideo != 'null' ">
+                and a.zaixianxuexi_video like CONCAT('%',#{params.zaixianxuexiVideo},'%')
+            </if>
+            <if test="params.jiaoshiId != null">
+                and a.jiaoshi_id = #{params.jiaoshiId}
+            </if>
+            <if test=" params.zaixianxuexiContent != '' and params.zaixianxuexiContent != null and params.zaixianxuexiContent != 'null' ">
+                and a.zaixianxuexi_content like CONCAT('%',#{params.zaixianxuexiContent},'%')
+            </if>
+
+            <if test=" params.jiaoshiName != '' and params.jiaoshiName != null and params.jiaoshiName != 'null' ">
+                and jiaoshi.jiaoshi_name like CONCAT('%',#{params.jiaoshiName},'%')
+            </if>
+            <if test="params.sexTypes != null">
+                and jiaoshi.sex_types = #{params.sexTypes}
+            </if>
+
+            <if test=" params.jiaoshiIdNumber != '' and params.jiaoshiIdNumber != null and params.jiaoshiIdNumber != 'null' ">
+                and jiaoshi.jiaoshi_id_number like CONCAT('%',#{params.jiaoshiIdNumber},'%')
+            </if>
+            <if test=" params.jiaoshiPhone != '' and params.jiaoshiPhone != null and params.jiaoshiPhone != 'null' ">
+                and jiaoshi.jiaoshi_phone like CONCAT('%',#{params.jiaoshiPhone},'%')
+            </if>
+        </where>
+        order by a.${params.orderBy} desc
+    </select>
+
+</mapper>
